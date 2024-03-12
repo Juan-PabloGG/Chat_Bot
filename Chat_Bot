@@ -1,0 +1,52 @@
+import os
+
+class BaseConocimiento:
+    def __init__(self):
+        self.conocimiento = {
+            "Hola": "¡Hola! ¿Cómo estás?",
+            "¿Cómo estás?": "Estoy bien, gracias por preguntar.",
+            "¿Cuál es tu nombre?": "Me llamo ChatBot.",
+            "¿Qué hora es?": "Lo siento, no tengo la capacidad de decir la hora."
+        }
+
+    def obtener_respuesta(self, pregunta):
+        return self.conocimiento.get(pregunta, "Lo siento, no entiendo.")
+
+def cargar_respuestas(nombre_archivo):
+    respuestas = {}
+    if os.path.exists(nombre_archivo):
+        with open(nombre_archivo, 'r') as file:
+            for line in file:
+                pregunta, respuesta = line.strip().split(':')
+                respuestas[pregunta] = respuesta
+    return respuestas
+
+def guardar_respuestas(nombre_archivo, respuestas):
+    with open(nombre_archivo, 'w') as file:
+        for pregunta, respuesta in respuestas.items():
+            file.write(f"{pregunta}:{respuesta}\n")
+
+def chat():
+    base = BaseConocimiento()
+    nombre_archivo = "respuestas_usuario.txt"
+    respuestas_usuario = cargar_respuestas(nombre_archivo)
+    
+    print("¡Bienvenido al chatbot! Puedes escribir 'Salir' en cualquier momento para terminar.")
+    while True:
+        entrada = input("Tú: ")
+        if entrada.lower() == 'salir':
+            guardar_respuestas(nombre_archivo, respuestas_usuario)
+            print("¡Hasta luego!")
+            break
+        elif entrada in respuestas_usuario:
+            print("Bot:", respuestas_usuario[entrada])
+        else:
+            respuesta = base.obtener_respuesta(entrada)
+            if respuesta != "Lo siento, no entiendo.":
+                print("Bot:", respuesta)
+            else:
+                respuesta_nueva = input("Bot: No sé la respuesta a esa pregunta. ¿Qué debería responder? ")
+                respuestas_usuario[entrada] = respuesta_nueva
+
+if __name__ == "__main__":
+    chat()
